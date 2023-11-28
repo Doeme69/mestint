@@ -10,16 +10,15 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../game_engine.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/mestint/game_engine.jar!/" />
         </CLASSES>
         <JAVADOC>
-          <root url="jar://$MODULE_DIR$/../../game_engine.jar!/javadoc" />
+          <root url="jar://$USER_HOME$/Desktop/mestint/game_engine.jar!/javadoc" />
         </JAVADOC>
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/../../game_engine.jar!/" />
+          <root url="jar://$USER_HOME$/Desktop/mestint/game_engine.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" name="game_engine" level="project" />
   </component>
 </module>
