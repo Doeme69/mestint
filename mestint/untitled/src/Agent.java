@@ -18,8 +18,6 @@ public class Agent extends RaceTrackPlayer {
         super(state, random, track, coins, color);
     }
 
-    boolean gotCoin = false;
-
     int pickedUpCoin = 0;
     List<Coin> coinvalues = Arrays.asList(coins);
 
@@ -36,8 +34,8 @@ public class Agent extends RaceTrackPlayer {
         Comparator<Coin> valueComparator = Comparator.comparing(coin -> coin.value);
         coinvalues.sort(valueComparator.reversed());
 
-        for (int i = 0; i < coinvalues.size(); i++){
-           coinPlaces[i] = coinvalues.get(i);
+        for (int i = 0; i < coinvalues.size(); i++) {
+            coinPlaces[i] = coinvalues.get(i);
         }
 
         if (visitedCells.size() > 1) {
@@ -48,7 +46,7 @@ public class Agent extends RaceTrackPlayer {
             visitedCells.add(new Cell(state.i, state.j));
         }
 
-        if (pickedUpCoin < 3) {
+        if (pickedUpCoin < 2) {
             return getToCoin();
         } else {
             return getToFinish();
@@ -67,10 +65,13 @@ public class Agent extends RaceTrackPlayer {
             return new Direction(newPath.get(1).i - newPath.get(0).i, newPath.get(1).j - newPath.get(0).j);
         }
 
+        if (coinpath.size() < state.vi || coinpath.size() < state.vj) {
+            return DIRECTIONS[0];
+        }
+
         for (int i = 0; i < coins.length; i++) {
             if (line4connect(coinpath.get(1), coinpath.get(0)).contains(coinPlaces[i])) {
                 if (line4connect(visitedCells.get(visitedCells.size() - 2), visitedCells.get(visitedCells.size() - 1)).contains(coinPlaces[i]) || coinPlaces[i].i == state.i && coinPlaces[i].j == state.j) {
-                    gotCoin = true;
                     pickedUpCoin++;
                 }
             }
