@@ -28,44 +28,58 @@ public class Agent extends RaceTrackPlayer {
     List<Cell> visitedCells = new LinkedList<>();
     List<PathCell> coinpath = BFSBestCoin(state.i, state.j, track);
     List<Direction> directions;
-    List<Cell> pathSzakasz;
+    ArrayList<Cell> pathSzakasz = new ArrayList<Cell>();
     int tries;
+    Direction currentDir;
 
     @Override
     public Direction getDirection(long remainingTime) {
 
+
         updateVisitedCells();
         if (iteration == 0){
-            updatePathSzakasz(coinpath.get(0));
-            System.out.println(pathSzakasz);
+            sortCoinsByValue();
+            pathSzakasz.add(new Cell(coinpath.get(0).i, coinpath.get(0).j));
+            updatePathSzakasz(pathSzakasz.get(0));
+        }
+        iteration++;
+
+        if (state.i == pathSzakasz.get(1).i && state.j == pathSzakasz.get(1).j) {
+            updatePathSzakasz(new Cell(state.i, state.j));
         }
 
-        iteration++;
-        return new Direction(0, 0);
+
+        return currentDir;
+
 
     }
 
     //ELindul, belerakom az elso elemet a listaba, kivonom a lista kovi elemebol a kezdopontot, az lesz a direction, majd a coinpath kovetkezo elemebol vonom ki a jelenlegi vegpontot
     //ha ez a kulonbseg megegyezik a jelenlegi directionnel akkor ez lesz az uj vegpont,
     //ha pedig ezek kulonbsege mas mint a direction akkor ez lesz a szakasz majd a vegpont lesz a kezdopontja a kovetkezo szakasznak
-    public void updatePathSzakasz(Cell kezdopont) {
+    public List<Cell> updatePathSzakasz(Cell kezdopont) {
         Cell vegpont;
-        Direction currentDir;
-        pathSzakasz.add(kezdopont);
 
-        pathSzakasz.set(0, kezdopont);
+        if (pathSzakasz.size() < 2) {
+            pathSzakasz.add(kezdopont);
+        } else {
+            pathSzakasz.set(0, kezdopont);
+        }
+        vegpont = coinpath.get(coinpath.indexOf(kezdopont) + 1);
+        currentDir = new Direction (vegpont.i - pathSzakasz.get(1).i, vegpont.j - pathSzakasz.get(1).j);
 
-        for (int i = 0; i < coinpath.size(); i++) {
-            vegpont = coinpath.get( i + 1 );
-
-            currentDir = new Direction (vegpont.i - kezdopont.i, vegpont.j - kezdopont.j);
+        for (int i = 1; i < coinpath.size(); i++) {
+            vegpont = coinpath.get(coinpath.indexOf(kezdopont) + i);
 
             if (currentDir.i == vegpont.i - pathSzakasz.get(1).i && currentDir.j == vegpont.j - pathSzakasz.get(1).j){
                 pathSzakasz.set(1, vegpont);
-                System.out.println(pathSzakasz);
             }
-
+            else break;
         }
+
+        System.out.println(pathSzakasz);
+
+        return pathSzakasz;
     }
 
     public List<PathCell> BFSBestCoin(int i, int j, int[][] track) {
