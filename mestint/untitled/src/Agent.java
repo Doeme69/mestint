@@ -37,22 +37,30 @@ public class Agent extends RaceTrackPlayer {
 
 
         updateVisitedCells();
+
+
         if (iteration == 0){
             sortCoinsByValue();
             pathSzakasz.add(new Cell(coinpath.get(0).i, coinpath.get(0).j));
             updatePathSzakasz(pathSzakasz.get(0));
+            getMaxVelocity();
         }
         iteration++;
 
         if (state.i == pathSzakasz.get(1).i && state.j == pathSzakasz.get(1).j) {
             updatePathSzakasz(new Cell(state.i, state.j));
+            getMaxVelocity();
         }
 
+        if (state.vi == getMaxVelocity() || state.vj == getMaxVelocity()){
+            if ( state.vi != 1 && state.vj != 1){
+                slowDown();
+            }
+        }
 
         return currentDir;
-
-
     }
+
 
     //ELindul, belerakom az elso elemet a listaba, kivonom a lista kovi elemebol a kezdopontot, az lesz a direction, majd a coinpath kovetkezo elemebol vonom ki a jelenlegi vegpontot
     //ha ez a kulonbseg megegyezik a jelenlegi directionnel akkor ez lesz az uj vegpont,
@@ -77,9 +85,19 @@ public class Agent extends RaceTrackPlayer {
             else break;
         }
 
-        System.out.println(pathSzakasz);
-
         return pathSzakasz;
+    }
+
+    public Direction slowDown(){
+        return new Direction(currentDir.i * -1, currentDir.j * -1);
+    }
+
+    public Cell getDistance() {
+        return new Cell(Math.abs(pathSzakasz.get(1).i - pathSzakasz.get(0).i), Math.abs(pathSzakasz.get(1).j - pathSzakasz.get(0).j));
+    }
+
+    public int getMaxVelocity(){
+        return Math.max((int) Math.sqrt(getDistance().i), (int) Math.sqrt(getDistance().j));
     }
 
     public List<PathCell> BFSBestCoin(int i, int j, int[][] track) {
@@ -129,85 +147,3 @@ public class Agent extends RaceTrackPlayer {
         }
     }
 }
-/*
-    public Direction getToCoin() {
-
-        if (visitedCells.contains(coinpath.get(0))) {
-            tries++;
-        }
-        if (tries > 3) {
-            tries = 0;
-            List<PathCell> newPath = RaceTrackGame.BFS(state.i, state.j, track);
-            return new Direction(newPath.get(1).i - newPath.get(0).i, newPath.get(1).j - newPath.get(0).j);
-        }
-
-        if (line4connect(coinpath.get(1), coinpath.get(0)).contains(coinPlaces[pickedUpCoin])) {
-            if (line4connect(visitedCells.get(visitedCells.size() - 2), visitedCells.get(visitedCells.size() - 1)).contains(coinPlaces[pickedUpCoin]) || coinPlaces[pickedUpCoin].i == state.i && coinPlaces[pickedUpCoin].j == state.j) {
-                pickedUpCoin++;
-            }
-        }
-        return new Direction(coinpath.get(1).i - coinpath.get(0).i, coinpath.get(1).j - coinpath.get(0).j);
-    }
-
-    public Direction getToFinish() {
-        List<PathCell> finnishpath = RaceTrackGame.BFS(state.i, state.j, track);
-        if (visitedCells.contains(finnishpath.get(0))) {
-            tries++;
-        }
-        if (tries > 3) {
-            tries = 0;
-            pickedUpCoin++;
-            List<PathCell> alternate = RaceTrackGame.BFS(state.i, state.j, track);
-            pickedUpCoin--;
-            return new Direction(alternate.get(1).i - alternate.get(0).i, alternate.get(1).j - alternate.get(0).j);
-        }
-
-        return new Direction(finnishpath.get(1).i - finnishpath.get(0).i, finnishpath.get(1).j - finnishpath.get(0).j);
-    }
-
-
-
-
-
-
-        return path;
-    }
-    public void move(RaceTrackPlayer player, Direction direction, int[][] track) {
-        int i = player.state.i + player.state.vi + direction.i;
-        int j = player.state.j + player.state.vj + direction.j;
-        // check wall collision
-        Cell cell = null;
-        for (Cell c : line8connect(toCell(player), new Cell(i, j))) {
-            if (isNotWall(c, track)) {
-                cell = c;
-            } else {
-                direction = null;
-                break;
-            }
-        }
-        // wall collision has been occurred
-        if (direction == null) {
-            player.state.vi = cell.i - player.state.i;
-            player.state.vj = cell.j - player.state.j;
-            direction = new Direction(0, 0);
-        }
-
-    while (!isNeitherWall(line8connect(toCell(player), new Cell(i, j)), track)) {
-      if (player.state.vi < 0) {
-        player.state.vi += 1;
-      } else if (0 < player.state.vi) {
-        player.state.vi -= 1;
-      } else if (player.state.vj < 0) {
-        player.state.vj += 1;
-      } else if (0 < player.state.vj) {
-        player.state.vj -= 1;
-      } else {
-        direction = new Direction(0, 0);
-      }
-      i = player.state.i + player.state.vi + direction.i;
-      j = player.state.j + player.state.vj + direction.j;
-    }
-        player.step(direction);
-    }
-
- */
