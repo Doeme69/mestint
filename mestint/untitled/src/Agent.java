@@ -43,10 +43,12 @@ public class Agent extends RaceTrackPlayer {
             updatePathSzakasz(pathSzakasz.get(0));
             getMaxVelocity();
         }
+
         iteration++;
 
         //ha vi-re van a vegtol akkor ugy lassitson hogy a vi 0 lesz
         if ((state.i + state.vi == pathSzakasz.get(1).i && state.j + state.vj == pathSzakasz.get(1).j)) {
+            shouldSlowDown = false;
             return new Direction(state.vi + state.vi * -2, state.vj + state.vj * -2);
         }
 
@@ -65,7 +67,7 @@ public class Agent extends RaceTrackPlayer {
         //ha lassulnia kell akkor amig a velocityje nem 1 addig lassuljon
         if (shouldSlowDown) {
             if ((state.vi == 1 || state.vi == -1) || (state.vj == 1 || state.vj == -1)) {
-                shouldSlowDown = false;
+                return new Direction(0, 0);
             } else
                 return slowDown();
         }
@@ -117,6 +119,8 @@ public class Agent extends RaceTrackPlayer {
         int maxVelocityY = (int)Math.sqrt(getDistance().j);
         MaxVelocity.add(maxVelocityX);
         MaxVelocity.add(maxVelocityY);
+
+        System.out.println(MaxVelocity);
 
         return MaxVelocity;
     }
