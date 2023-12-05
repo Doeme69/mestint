@@ -3,6 +3,7 @@
 import java.util.*;
 
 import game.racetrack.Direction;
+import game.racetrack.RaceTrackGame;
 import game.racetrack.RaceTrackPlayer;
 import game.racetrack.utils.Cell;
 import game.racetrack.utils.Coin;
@@ -19,14 +20,14 @@ public class Agent extends RaceTrackPlayer {
     }
 
     int iteration = 0;
-    int pickedUpCoin = 0;
+    int pickedUpCoin = 1;
     List<Coin> coinvalues = Arrays.asList(coins);
 
     Cell[] coinPlaces = new Cell[coinvalues.size()];
     LinkedList<PathCell> path = new LinkedList<PathCell>();
 
     List<Cell> visitedCells = new LinkedList<>();
-    List<PathCell> coinpath = BFSBestCoin(state.i, state.j, track);
+    List<PathCell> pathPath = BFSBestCoin(state.i, state.j, track);
     ArrayList<Cell> pathSzakasz = new ArrayList<Cell>();
     Direction currentDir;
 
@@ -39,7 +40,7 @@ public class Agent extends RaceTrackPlayer {
 
         if (iteration == 0) {
             sortCoinsByValue();
-            pathSzakasz.add(new Cell(coinpath.get(0).i, coinpath.get(0).j));
+            pathSzakasz.add(new Cell(pathPath.get(0).i, pathPath.get(0).j));
             updatePathSzakasz(pathSzakasz.get(0));
             getMaxVelocity();
         }
@@ -60,7 +61,7 @@ public class Agent extends RaceTrackPlayer {
         }
 
         //ha elerem azt a sebesseget amivel meg tudok meg allni idoben akkor lassulnia kell
-        if ((state.vi == getMaxVelocity().get(0) && state.vi != 0) || (state.vj == getMaxVelocity().get(1) && state.vj != 0)) {
+        if ((Math.abs(state.vi) == getMaxVelocity().get(0) && state.vi != 0) || (Math.abs(state.vj) == getMaxVelocity().get(1) && state.vj != 0)) {
             shouldSlowDown = true;
         }
 
@@ -70,6 +71,12 @@ public class Agent extends RaceTrackPlayer {
                 return new Direction(0, 0);
             } else
                 return slowDown();
+        }
+        if (pathSzakasz.get(1).i == pathPath.get(pathPath.size() -1).i && pathSzakasz.get(1).j == pathPath.get(pathPath.size() -1).j){
+            if (pickedUpCoin < 1) {
+                pickedUpCoin++;
+                pathPath = BFSBestCoin(state.i, state.j, track);
+            } else pathPath = RaceTrackGame.BFS(state.i, state.j, track);
         }
 
         return currentDir;
@@ -87,19 +94,17 @@ public class Agent extends RaceTrackPlayer {
         } else {
             pathSzakasz.set(0, kezdopont);
         }
-        vegpont = coinpath.get(coinpath.indexOf(kezdopont) + 1);
+        vegpont = pathPath.get(pathPath.indexOf(kezdopont) + 1);
         currentDir = new Direction(vegpont.i - pathSzakasz.get(1).i, vegpont.j - pathSzakasz.get(1).j);
 
-        for (int i = 1; i < coinpath.size(); i++) {
-            vegpont = coinpath.get(coinpath.indexOf(kezdopont) + i);
+        for (int i = 1; i < pathPath.size(); i++) {
+            vegpont = pathPath.get(pathPath.indexOf(kezdopont) + i);
 
             if (currentDir.i == vegpont.i - pathSzakasz.get(1).i && currentDir.j == vegpont.j - pathSzakasz.get(1).j) {
                 pathSzakasz.set(1, vegpont);
             } else
                 break;
         }
-
-        System.out.println(pathSzakasz);
     }
 
     //ugy lassit hogy az irany ellentetet adja vissza
@@ -120,8 +125,6 @@ public class Agent extends RaceTrackPlayer {
         MaxVelocity.add(maxVelocityX);
         MaxVelocity.add(maxVelocityY);
 
-        System.out.println(MaxVelocity);
-
         return MaxVelocity;
     }
 
@@ -132,7 +135,7 @@ public class Agent extends RaceTrackPlayer {
         open.add(current);
         while(!open.isEmpty()) {
             current = open.pollFirst();
-            if (new Cell(current.i, current.j).equals(coinPlaces[pickedUpCoin])) {
+            if (new Cell(current.i, current.j).equals(coinPlaces[0])) {
                 break;
             }
             close.add(current);
